@@ -164,7 +164,7 @@ cython_debug/
 
 infra/.terraform/
 infra/.terraform.lock.hcl
+infra/.terraform.tfstate*
 infra/terraform.tfstate
-infra/terraform.tfstate.backup
 infra/terraform.tfvars
 infra/creds.json
