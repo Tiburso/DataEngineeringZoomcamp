@@ -1,8 +1,7 @@
-version: "1"
+version: "3"
 
 volumes:
   postgres-data:
-
 
 networks:
   main:
@@ -13,13 +12,67 @@ services:
     image: postgres
     container_name: postgres
     restart: always
+    
+    env_file: .env
+
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: mage
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DBNAME}
     volumes:
       - postgres-data:/var/lib/postgresql/data
     ports:
-      - "5432:5432"
+      - 5432:5432
     networks:
       - main
+
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 5s
+      retries: 5
+
+
+  scheduler:
+    build: .
+    command: scheduler
+    restart: on-failure
+    depends_on:
+        - postgres
+    env_file:
+        - .env
+    volumes:
+        - ./dags:/opt/airflow/dags
+        - ./logs:/opt/airflow/logs
+        - ./plugins:/opt/airflow/plugins
+        - ./scripts:/opt/airflow/scripts
+        - ./infra/creds.json:/.google/credentials/creds.json:ro
+    networks:
+      - main
+
+  webserver:
+      build: .
+      entrypoint: ./scripts/entrypoint.sh
+      restart: on-failure
+      depends_on:
+          - postgres
+          - scheduler
+      env_file:
+          - .env
+      volumes:
+          - ./dags:/opt/airflow/dags
+          - ./logs:/opt/airflow/logs
+          - ./plugins:/opt/airflow/plugins
+          - ./scripts:/opt/airflow/scripts
+          - ./infra/creds.json:/.google/credentials/creds.json:ro
+
+      user: "${AIRFLOW_UID:-50000}:0"
+      ports:
+          - "8080:8080"
+      healthcheck:
+          test: [ "CMD-SHELL", "[ -f /home/airflow/airflow-webserver.pid ]" ]
+          interval: 30s
+          timeout: 30s
+          retries: 3
+      
+      networks:
+        - main
