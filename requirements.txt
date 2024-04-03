@@ -2,3 +2,6 @@ pandas
 numpy
 psycopg2-binary
 sqlalchemy
+apache-airflow[google]==2.8.4
+apache-airflow-providers-google
+pyarrow

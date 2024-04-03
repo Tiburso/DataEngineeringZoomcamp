@@ -1,12 +1,13 @@
 # First-time build can take upto 10 mins.
 FROM apache/airflow:2.8.4
 
+ARG AIRFLOW_PROJ_DIR
 ENV AIRFLOW_VERSION=2.8.4
 ENV AIRFLOW_HOME=/opt/airflow
 
 USER airflow
 COPY requirements.txt .
-RUN pip install --no-cache-dir "apache-airflow==${AIRFLOW_VERSION}" -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 # Ref: https://airflow.apache.org/docs/docker-stack/recipes.html
 
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
@@ -32,7 +33,5 @@ RUN DOWNLOAD_URL="https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/goo
 
 WORKDIR $AIRFLOW_HOME
 
-COPY scripts scripts
+COPY airflow/scripts scripts
 RUN chmod +x scripts
-
-USER $AIRFLOW_UID
