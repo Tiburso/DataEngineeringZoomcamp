@@ -2,6 +2,7 @@
 
 SELECT 
 -- Identifiers
+    {{ dbt_utils.generate_surrogate_key(['VendorID', 'lpep_pickup_datetime']) }} as tripid,
     cast("VendorID" as integer) as vendorid,
     cast("RatecodeID" as integer) as ratecodeid,
     cast("PULocationID" as integer) as pulocationid,
@@ -30,4 +31,7 @@ SELECT
     {{ get_payment_type_description('payment_type') }} as payment_type_description,
     cast("congestion_surcharge" as numeric) as congestion_surcharge
 FROM {{ source('staging', 'green_tripdata') }}
-LIMIT 100
+
+{% if var('is_test_run', default=true) %}
+    LIMIT 100
+{% endif %}
