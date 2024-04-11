@@ -56,7 +56,7 @@ def fetch_weather_data():
             response["temporaryDownloadUrl"], file_location
         )
 
-        return latest_file
+        return file_location
 
     @task()
     def convert_nc_to_parquet(file_name: str):
@@ -88,7 +88,7 @@ def fetch_weather_data():
             task_id="upload_parquet_to_gcs",
             src=parquet_file_name,
             dst=destination_name,
-            bucket="weather_data_bucket",
+            bucket="weather_data_de_bucket",
             gcp_conn_id="google_cloud_default",
         ).execute(context=None)
 

@@ -26,13 +26,13 @@ variable "location" {
 variable "bq_dataset_name" {
   description = "My BigQuery Dataset Name"
   #Update the below to what you want your dataset to be called
-  default = "weather_data"
+  default = "weather_data_de"
 }
 
 variable "gcs_bucket_name" {
   description = "My Storage Bucket Name"
   #Update the below to a unique bucket name
-  default = "weather_data_bucket"
+  default = "weather_data_de_bucket"
 }
 
 variable "gcs_storage_class" {
