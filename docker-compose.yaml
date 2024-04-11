@@ -180,11 +180,6 @@ services:
         - -c
         - airflow
 
-    # jupyter-spark:
-    #   image: quay.io/jupyter/pyspark-notebook:2024-03-14
-    #   ports:
-    #     - 8888:8888
-
     metabase:
       container_name: metabase
       image: metabase/metabase
