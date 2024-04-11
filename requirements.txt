@@ -1,7 +1,9 @@
 pandas
 numpy
-apache-airflow[google]==2.8.4
 pyarrow
-dbt-postgres
-psycopg2-binary
 sqlalchemy
+psycopg2-binary
+dbt-postgres
+apache-airflow==2.8.4
+apache-airflow-providers-apache-spark
+apache-airflow-providers-google
