@@ -14,7 +14,7 @@ provider "google" {
 }
 
 
-resource "google_storage_bucket" "demo-bucket" {
+resource "google_storage_bucket" "weather_lake" {
   name          = var.gcs_bucket_name
   location      = var.location
   force_destroy = true
@@ -32,7 +32,9 @@ resource "google_storage_bucket" "demo-bucket" {
 
 
 
-resource "google_bigquery_dataset" "demo_dataset" {
+resource "google_bigquery_dataset" "weather_dataset" {
   dataset_id = var.bq_dataset_name
   location   = var.location
 }
+
+# In the future create a dataproc cluster
