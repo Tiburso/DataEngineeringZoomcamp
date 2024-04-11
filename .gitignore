@@ -171,4 +171,4 @@ infra/creds.json
 
 # Airflow
 
-airflow/logs/
+airflow/logs
