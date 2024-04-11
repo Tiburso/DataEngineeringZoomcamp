@@ -38,8 +38,24 @@ services:
       &airflow-common-depends-on
       postgres:
         condition: service_healthy
+      spark:
+        condition: service_healthy
 
   services:
+    spark:
+      image: spark:3.5.1
+      ports:
+        - 8080:8080
+        - 7077:7077
+        - 4040:4040
+      healthcheck:
+        test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+        start_period: 30s
+      restart: always
+
     postgres:
       image: postgres:13
       env_file:
