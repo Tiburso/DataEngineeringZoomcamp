@@ -93,8 +93,25 @@ services:
       - 7077:7077
       - 8081:8081
     command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    volumes:
+      - ./spark-jars:/tmp/jars
+      - ./infra/creds.json:/.google/credentials/google_credentials.json
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+
+  spark-slave: 
+    image: spark:3.5.1
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark:7077
+    volumes:
+      - ./spark-jars:/tmp/jars
+      - ./infra/creds.json:/.google/credentials/google_credentials.json
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8081/health"]
       interval: 30s
       timeout: 10s
       retries: 5
