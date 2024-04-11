@@ -81,7 +81,7 @@ def fetch_weather_data():
 
         # Destination bucket structure
         # is gonna be year/month/day/hour/minute
-        destination_name = f"{DATASET_NAME}/{DATASET_VERSION}/{file_date[:4]}/{file_date[4:6]}/{file_date[6:8]}/{file_date[8:10]}/{file_date[10:12]}"
+        destination_name = f"{DATASET_NAME}/{DATASET_VERSION}/{file_date[:4]}/{file_date[4:6]}/{file_date[6:8]}/{file_date[8:10]}/{file_date[10:12]}/weather_data.parquet"
 
         # Upload the file to GCS
         LocalFilesystemToGCSOperator(
