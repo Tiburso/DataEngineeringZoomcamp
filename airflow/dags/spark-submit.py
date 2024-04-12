@@ -40,8 +40,9 @@ def read_parquet(spark: SparkSession, year, month, day, hour, minute) -> DataFra
 def insert_big_query(df: DataFrame):
     (
         df.write.format("bigquery")
-        .option("writeMethod", "direct")
+        .option("temporaryGcsBucket", "weather_data_de_bucket")
         .mode("append")
+        .option("parentProject", "dataengineeringbootcamp-419022")
         .save("dataengineeringbootcamp-419022:weather_data_de.weather_data")
     )
 
