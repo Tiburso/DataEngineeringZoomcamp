@@ -17,6 +17,12 @@ variable "region" {
   default = "europe-west1"
 }
 
+variable "zone" {
+  description = "Zone"
+  #Update the below to your desired zone
+  default = "europe-west1-b"
+}
+
 variable "location" {
   description = "Project Location"
   #Update the below to your desired location
@@ -38,4 +44,10 @@ variable "gcs_bucket_name" {
 variable "gcs_storage_class" {
   description = "Bucket Storage Class"
   default     = "STANDARD"
+}
+
+variable "dataproc_cluster_name" {
+  description = "My Dataproc Cluster Name"
+  #Update the below to what you want your cluster to be called
+  default = "weather-data-de-cluster"
 }

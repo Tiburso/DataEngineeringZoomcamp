@@ -91,8 +91,7 @@ services:
     ports:
       - 8080:8080
       - 7077:7077
-      - 8081:8081
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    command: bash -c "cp /tmp/jars/* /opt/spark/jars && /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip spark --port 7077 && /opt/spark/bin/spark-class org.apache.spark.deploy.worker Worker spark://spark:7077"
     volumes:
       - ./spark-jars:/tmp/jars
       - ./infra/creds.json:/.google/credentials/google_credentials.json
@@ -106,7 +105,9 @@ services:
 
   spark-slave: 
     image: spark:3.5.1
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark:7077
+    command: bash -c "cp /tmp/jars/* /opt/spark/jars && /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark:7077"
+    ports:
+      - 8081:8081
     volumes:
       - ./spark-jars:/tmp/jars
       - ./infra/creds.json:/.google/credentials/google_credentials.json
@@ -118,8 +119,7 @@ services:
       start_period: 30s
     restart: always
     depends_on:
-      - spark:
-          condition: service_healthy
+      - spark
 
   postgres:
     image: postgres:13
