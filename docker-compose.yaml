@@ -87,39 +87,26 @@ x-airflow-common:
 
 services:
   spark:
-    image: spark:3.5.1
+    build: .
+    environment:
+      - SPARK_MODE=master
     ports:
-      - 8080:8080
-      - 7077:7077
-    command: bash -c "cp /tmp/jars/* /opt/spark/jars && /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master --ip spark --port 7077 && /opt/spark/bin/spark-class org.apache.spark.deploy.worker Worker spark://spark:7077"
+      - '8080:8080'
+      - '4040:4040'
     volumes:
-      - ./spark-jars:/tmp/jars
-      - ./infra/creds.json:/.google/credentials/google_credentials.json
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-
-  spark-slave: 
-    image: spark:3.5.1
-    command: bash -c "cp /tmp/jars/* /opt/spark/jars && /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark:7077"
-    ports:
-      - 8081:8081
+      - ./data:/data
+      - ./src:/src
+  spark-worker:
+    build: .
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark:7077
+      - SPARK_WORKER_MEMORY=4G
+      - SPARK_EXECUTOR_MEMORY=4G
+      - SPARK_WORKER_CORES=4
     volumes:
-      - ./spark-jars:/tmp/jars
-      - ./infra/creds.json:/.google/credentials/google_credentials.json
-    healthcheck:
-      test: ["CMD", "curl", "--fail", "http://localhost:8081/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    restart: always
-    depends_on:
-      - spark
+      - ./data:/data
+      - ./src:/src 
 
   postgres:
     image: postgres:13
