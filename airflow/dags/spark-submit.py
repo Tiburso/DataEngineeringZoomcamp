@@ -10,8 +10,6 @@ def create_context() -> SparkSession:
     conf = (
         SparkConf()
         .setAppName("GCSRead")
-        .set("spark.hadoop.google.cloud.auth.service.account.enable", "true")
-        .set("spark.hadoop.google.cloud.auth.service.account.json.keyfile", keyfile)
         .set("spark.sql.legacy.parquet.nanosAsLong", "true")
     )
 
@@ -25,25 +23,25 @@ def create_context() -> SparkSession:
     hadoop_conf.set(
         "fs.AbstractFileSystem.gs.impl", "com.google.cloud.hadoop.fs.gcs.GoogleHadoopFS"
     )
-    hadoop_conf.set("google.cloud.auth.service.account.enable", "true")
-    hadoop_conf.set("google.cloud.auth.service.account.json.keyfile", keyfile)
 
     return SparkSession.builder.config(conf=sc.getConf()).getOrCreate()
 
 
-def read_parquet(spark: SparkSession, year, month, day, hour, minute) -> DataFrame:
-    file_location = f"gs://weather_data_de_bucket/Actuele10mindataKNMIstations/2/{year}/{month}/{day}/{hour}/{minute}/weather_data.parquet"
+def read_parquet(
+    spark: SparkSession, bucket, year, month, day, hour, minute
+) -> DataFrame:
+    file_location = f"gs://{bucket}/Actuele10mindataKNMIstations/2/{year}/{month}/{day}/{hour}/{minute}/weather_data.parquet"
 
     return spark.read.parquet(file_location)
 
 
-def insert_big_query(df: DataFrame):
+def insert_big_query(df: DataFrame, bucket, project, dataset):
     (
         df.write.format("bigquery")
-        .option("temporaryGcsBucket", "weather_data_de_bucket")
+        .option("temporaryGcsBucket", bucket)
         .mode("append")
-        .option("parentProject", "dataengineeringbootcamp-419022")
-        .save("dataengineeringbootcamp-419022:weather_data_de.weather_data")
+        .option("parentProject", project)
+        .save(f"{project}:{dataset}.weather_data")
     )
 
 
@@ -58,8 +56,14 @@ if __name__ == "__main__":
     parser.add_argument("--hour", type=str, required=True)
     parser.add_argument("--minute", type=str, required=True)
 
+    parser.add_argument("--project", type=str, required=True)
+    parser.add_argument("--dataset", type=str, required=True)
+    parser.add_argument("--bucket", type=str, required=True)
+
     args = parser.parse_args()
 
     spark = create_context()
-    df = read_parquet(spark, args.year, args.month, args.day, args.hour, args.minute)
-    insert_big_query(df)
+    df = read_parquet(
+        spark, args.bucket, args.year, args.month, args.day, args.hour, args.minute
+    )
+    insert_big_query(df, args.bucket, args.project, args.dataset)

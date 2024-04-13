@@ -40,12 +40,12 @@ resource "google_bigquery_dataset" "weather_dataset" {
 # In the future create a dataproc cluster
 resource "google_dataproc_cluster" "spark_cluster" {
   name   = var.dataproc_cluster_name
-  region = "europe-east1"
+  region = var.region
 
   cluster_config {
-    # gce_cluster_config {
-    #   zone = var.zone
-    # }
+    gce_cluster_config {
+      zone = var.zone
+    }
 
     software_config {
       override_properties = {
