@@ -61,10 +61,15 @@ def fetch_weather_data():
     @task()
     def convert_nc_to_parquet(file_name: str):
         from xarray import open_dataset
-        from pandas import DataFrame
+        from pandas import DataFrame, to_datetime
 
         data = open_dataset(file_name)
         df: DataFrame = data.to_dataframe()
+
+        # Parse the parquet file name to get the bucket name
+        file_date = file_name.split("_")[-1].split(".")[0]
+
+        df["datetime"] = to_datetime(file_date, format="%Y%m%d%H%M")
 
         parquet_name = file_name.replace(".nc", ".parquet")
 
