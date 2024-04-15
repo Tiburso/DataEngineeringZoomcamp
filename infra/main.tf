@@ -46,12 +46,5 @@ resource "google_dataproc_cluster" "spark_cluster" {
     gce_cluster_config {
       zone = var.zone
     }
-
-    software_config {
-      override_properties = {
-        "dataproc:dataproc.allow.zero.workers" = "true"
-      }
-    }
   }
-
 }
