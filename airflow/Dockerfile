@@ -10,6 +10,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 # Ref: https://airflow.apache.org/docs/docker-stack/recipes.html
 
+# Add DBT profile file to the image
+COPY dbt_profile.yml /home/airflow/.dbt/profiles.yml
+
 SHELL ["/bin/bash", "-o", "pipefail", "-e", "-u", "-x", "-c"]
 
 USER root
