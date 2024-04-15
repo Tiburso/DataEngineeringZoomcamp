@@ -2,8 +2,6 @@ version: 2
 
 sources:
   - name: staging
-    database: airflow
-    schema: dbt
-
+    dataset: weather_data_de
     tables:
-      - name: green_tripdata
+      - name: weather_data
