@@ -26,6 +26,7 @@ DATASET = "weather_data_de"
 def bucket_to_view():
     @task()
     def bucket_to_bigquery_spark():
+        # Import regular spark submit job operator
         from airflow.providers.google.cloud.operators.dataproc import (
             DataprocSubmitJobOperator,
         )
