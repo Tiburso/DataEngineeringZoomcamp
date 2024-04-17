@@ -37,32 +37,6 @@ resource "google_bigquery_dataset" "weather_dataset" {
   location   = var.location
 }
 
-resource "google_dataproc_cluster" "spark_cluster" {
-  name   = var.dataproc_cluster_name
-  region = var.region
-
-  cluster_config {
-    master_config {
-      num_instances = 1
-      disk_config {
-        boot_disk_size_gb = 30
-      }
-    }
-
-    gce_cluster_config {
-      zone = var.zone
-
-    }
-
-    software_config {
-      override_properties = {
-        "dataproc:dataproc.allow.zero.workers" = "true"
-      }
-    }
-
-  }
-}
-
 resource "google_compute_network" "vpc_network" {
   name                    = "my-custom-mode-network"
   auto_create_subnetworks = false
@@ -72,7 +46,7 @@ resource "google_compute_network" "vpc_network" {
 resource "google_compute_subnetwork" "default" {
   name          = "my-custom-subnet"
   ip_cidr_range = "10.0.1.0/24"
-  region        = "us-west1"
+  region        = var.region
   network       = google_compute_network.vpc_network.id
 }
 
@@ -89,11 +63,30 @@ resource "google_compute_firewall" "metabase_firewall" {
   source_ranges = ["0.0.0.0/0"]
 }
 
+resource "google_compute_firewall" "metabase_ssh" {
+  name    = "allow-ssh"
+  network = google_compute_network.vpc_network.id
+
+  allow {
+    protocol = "tcp"
+    ports    = ["22"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+
+  target_tags = ["ssh"]
+}
+
+resource "google_compute_address" "metabase_address" {
+  name = "metabase-address-de"
+}
+
 # Google compute engine instance to host metabase
 resource "google_compute_instance" "metabase_instance" {
   name         = "metabase-instance"
   machine_type = "e2-micro"
   zone         = var.zone
+  tags         = ["ssh"]
 
   boot_disk {
     initialize_params {
@@ -103,11 +96,15 @@ resource "google_compute_instance" "metabase_instance" {
 
   network_interface {
     subnetwork = google_compute_subnetwork.default.id
+
+    access_config {
+      nat_ip = google_compute_address.metabase_address.address
+    }
   }
 
   metadata_startup_script = file("scripts/metabase.sh")
 }
 
-output "Metabase URL" {
-  value = join("", ["http://", google_compute_instance.default.network_interface.0.access_config.0.nat_ip, ":3000"])
+output "Metabase-URL" {
+  value = join("", ["http://", google_compute_instance.metabase_instance.network_interface.0.access_config.0.nat_ip, ":3000"])
 }
