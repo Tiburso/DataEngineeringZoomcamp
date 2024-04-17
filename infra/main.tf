@@ -37,7 +37,6 @@ resource "google_bigquery_dataset" "weather_dataset" {
   location   = var.location
 }
 
-# In the future create a dataproc cluster
 resource "google_dataproc_cluster" "spark_cluster" {
   name   = var.dataproc_cluster_name
   region = var.region
@@ -63,4 +62,36 @@ resource "google_dataproc_cluster" "spark_cluster" {
       zone = var.zone
     }
   }
+}
+
+resource "google_compute_network" "vpc_network" {
+  name                    = "my-custom-mode-network"
+  auto_create_subnetworks = false
+  mtu                     = 1460
+}
+
+resource "google_compute_subnetwork" "default" {
+  name          = "my-custom-subnet"
+  ip_cidr_range = "10.0.1.0/24"
+  region        = "us-west1"
+  network       = google_compute_network.vpc_network.id
+}
+
+# Google compute engine instance to host metabase
+resource "google_compute_instance" "metabase_instance" {
+  name         = "metabase-instance"
+  machine_type = "e2-micro"
+  zone         = var.zone
+
+  boot_disk {
+    initialize_params {
+      image = "debian-cloud/debian-10"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+
+  metadata_startup_script = file("scripts/metabase.sh")
 }

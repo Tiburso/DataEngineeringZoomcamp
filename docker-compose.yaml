@@ -51,8 +51,7 @@ x-airflow-common:
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
   # image: ${AIRFLOW_IMAGE_NAME:-apache/airflow:2.8.4}
   build: 
-    context: .
-    dockerfile: airflow/Dockerfile
+    context: airflow
   env_file: .env
   environment:
     &airflow-common-env
@@ -75,8 +74,11 @@ x-airflow-common:
     - ${AIRFLOW_PROJ_DIR:-.}/logs:/opt/airflow/logs
     - ${AIRFLOW_PROJ_DIR:-.}/config:/opt/airflow/config
     - ${AIRFLOW_PROJ_DIR:-.}/plugins:/opt/airflow/plugins
+    - ${AIRFLOW_PROJ_DIR:-.}/dbt_profile.yml:/home/airflow/.dbt/profiles.yml
+    - ./dbt:/opt/dbt
     # Credentials to login with google cloud via operator
     - ./infra/creds.json:/.google/credentials/google_credentials.json
+
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:
     &airflow-common-depends-on

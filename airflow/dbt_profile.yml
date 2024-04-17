@@ -3,8 +3,8 @@ bigquery:
     dev:
       type: bigquery
       method: service-account
-      project: { { env_var('GCP_PROJECT_ID') } }
-      dataset: { { env_var('GCP_GCS_DATASET') } }
+      project: "{{ env_var('GCP_PROJECT_ID') }}"
+      dataset: "{{ env_var('GCP_BIGQUERY_DATASET') }}"
       threads: 4
-      keyfile: { { env_var('GOOGLE_APPLICATION_CREDENTIALS') } }
+      keyfile: "{{ env_var('GOOGLE_APPLICATION_CREDENTIALS') }}"
   target: dev

@@ -1,7 +1,7 @@
 pandas
 numpy
 pyarrow
-dbt-postgres
+dbt-bigquery
 apache-airflow==2.8.4
 apache-airflow-providers-apache-spark
 apache-airflow-providers-google
