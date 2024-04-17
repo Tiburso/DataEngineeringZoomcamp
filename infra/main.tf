@@ -43,6 +43,22 @@ resource "google_dataproc_cluster" "spark_cluster" {
   region = var.region
 
   cluster_config {
+    master_config {
+      num_instances = 1
+      disk_config {
+        boot_disk_size_gb = 30
+      }
+    }
+
+    worker_config {
+      num_instances     = 2
+      min_num_instances = 2
+
+      disk_config {
+        boot_disk_size_gb = 30
+      }
+    }
+
     gce_cluster_config {
       zone = var.zone
     }

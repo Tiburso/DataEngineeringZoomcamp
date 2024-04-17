@@ -244,8 +244,12 @@ services:
 
   metabase:
     image: metabase/metabase
+    environment:
+      - MB_DB_FILE=/metabase-data/metabase.db
     ports:
       - 3000:3000
+    volumes:
+      - metabase-data:/metabase-data
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:3000/health"]
       interval: 30s
@@ -257,3 +261,4 @@ services:
 
 volumes:
   postgres-db-volume:
+  metabase-data:
