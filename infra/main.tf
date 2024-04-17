@@ -49,18 +49,17 @@ resource "google_dataproc_cluster" "spark_cluster" {
       }
     }
 
-    worker_config {
-      num_instances     = 2
-      min_num_instances = 2
+    gce_cluster_config {
+      zone = var.zone
 
-      disk_config {
-        boot_disk_size_gb = 30
+    }
+
+    software_config {
+      override_properties = {
+        "dataproc:dataproc.allow.zero.workers" = "true"
       }
     }
 
-    gce_cluster_config {
-      zone = var.zone
-    }
   }
 }
 
