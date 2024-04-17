@@ -78,6 +78,7 @@ x-airflow-common:
     - ./dbt:/opt/dbt
     # Credentials to login with google cloud via operator
     - ./infra/creds.json:/.google/credentials/google_credentials.json
+    - ./spark-jars:/opt/spark/jars
 
   user: "${AIRFLOW_UID:-50000}:0"
   depends_on:

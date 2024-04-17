@@ -102,7 +102,9 @@ resource "google_compute_instance" "metabase_instance" {
     }
   }
 
-  metadata_startup_script = file("scripts/metabase.sh")
+  metadata = {
+    user-data = file("scripts/metabase-config.yaml")
+  }
 }
 
 output "Metabase-URL" {
