@@ -85,12 +85,12 @@ resource "google_compute_instance" "metabase_instance" {
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-11"
     }
   }
 
   network_interface {
-    network = "default"
+    network = google_compute_network.vpc_network.id
   }
 
   metadata_startup_script = file("scripts/metabase.sh")
