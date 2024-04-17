@@ -102,8 +102,12 @@ resource "google_compute_instance" "metabase_instance" {
   }
 
   network_interface {
-    network = google_compute_network.vpc_network.id
+    subnetwork = google_compute_subnetwork.default.id
   }
 
   metadata_startup_script = file("scripts/metabase.sh")
+}
+
+output "Metabase URL" {
+  value = join("", ["http://", google_compute_instance.default.network_interface.0.access_config.0.nat_ip, ":3000"])
 }
