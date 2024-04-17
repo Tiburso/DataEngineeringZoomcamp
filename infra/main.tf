@@ -77,6 +77,19 @@ resource "google_compute_subnetwork" "default" {
   network       = google_compute_network.vpc_network.id
 }
 
+# Add firewall rule for port 3000
+resource "google_compute_firewall" "metabase_firewall" {
+  name    = "allow-metabase"
+  network = google_compute_network.vpc_network.id
+
+  allow {
+    protocol = "tcp"
+    ports    = ["3000"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+}
+
 # Google compute engine instance to host metabase
 resource "google_compute_instance" "metabase_instance" {
   name         = "metabase-instance"
