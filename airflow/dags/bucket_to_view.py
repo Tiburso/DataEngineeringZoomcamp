@@ -81,12 +81,12 @@ def bucket_to_view():
 
         op = BashOperator(
             task_id="execute_dbt",
-            bash_command="dbt run",
+            bash_command="dbt run --project-dir /opt/dbt",
         )
 
         op.execute()
 
-    bucket_to_bigquery_spark()
+    bucket_to_bigquery_spark >> execute_dbt
 
 
 bucket_to_view()
