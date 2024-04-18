@@ -4,8 +4,6 @@ from pyspark.context import SparkContext
 
 
 def create_context() -> SparkSession:
-    keyfile = "/home/manuel/Projects/DataEngineeringZoomcamp/infra/creds.json"
-
     # Use spark gcs connector
     conf = (
         SparkConf()

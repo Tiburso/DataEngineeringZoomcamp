@@ -30,11 +30,34 @@ resource "google_storage_bucket" "weather_lake" {
   }
 }
 
-
-
 resource "google_bigquery_dataset" "weather_dataset" {
   dataset_id = var.bq_dataset_name
   location   = var.location
+}
+
+resource "google_dataproc_cluster" "spark_cluster" {
+  name   = var.dataproc_cluster_name
+  region = var.region
+
+  cluster_config {
+    master_config {
+      num_instances = 1
+      machine_type  = "n1-standard-2"
+      disk_config {
+        boot_disk_size_gb = 50
+      }
+    }
+
+    gce_cluster_config {
+      zone = "europe-west1-a"
+    }
+
+    software_config {
+      override_properties = {
+        "dataproc:dataproc.allow.zero.workers" = "true"
+      }
+    }
+  }
 }
 
 resource "google_compute_network" "vpc_network" {
