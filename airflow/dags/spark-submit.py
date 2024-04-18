@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession, DataFrame
 from pyspark.conf import SparkConf
 from pyspark.context import SparkContext
 
+from pyspark.sql.functions import from_unixtime, col, hour, minute
+
 
 def create_context() -> SparkSession:
     # Use spark gcs connector
@@ -9,6 +11,8 @@ def create_context() -> SparkSession:
         SparkConf()
         .setAppName("GCSRead")
         .set("spark.sql.legacy.parquet.nanosAsLong", "true")
+        # Set timezone to Amsterdam
+        .set("spark.sql.session.timeZone", "Europe/Amsterdam")
     )
 
     sc = SparkContext(conf=conf)
@@ -33,11 +37,32 @@ def read_parquet(
     return spark.read.parquet(file_location)
 
 
+def create_date_columns(df: DataFrame):
+    # Create a column for the date converting the datetime timestamp to a date
+    df = df.withColumn(
+        "date",
+        from_unixtime(col("datetime") / 1000000000).cast("date"),
+    )
+
+    # Create hour and minute columns
+    df = df.withColumn(
+        "hour",
+        hour(col("date")),
+    )
+
+    df = df.withColumn(
+        "minute",
+        minute(col("date")),
+    )
+
+    return df
+
+
 def insert_big_query(df: DataFrame, bucket, project, dataset):
     (
         df.write.format("bigquery")
         .option("temporaryGcsBucket", bucket)
-        .mode("append")
+        .mode("overwrite")
         .option("parentProject", project)
         .save(f"{project}:{dataset}.weather_data")
     )
@@ -64,4 +89,7 @@ if __name__ == "__main__":
     df = read_parquet(
         spark, args.bucket, args.year, args.month, args.day, args.hour, args.minute
     )
+
+    df = create_date_columns(df)
+
     insert_big_query(df, args.bucket, args.project, args.dataset)

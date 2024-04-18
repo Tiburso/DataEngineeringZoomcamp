@@ -9,10 +9,10 @@ SELECT
 FROM 
     {{ source('staging', 'weather_data') }}
 WHERE
-    D1H >= 30
+    D1H >= 50
 GROUP BY 
     stationname
     
-{% if var('is_test_run', default=true) %}
+{% if var('is_test_run', default=false) %}
     LIMIT 100
 {% endif %}
