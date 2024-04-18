@@ -42,14 +42,14 @@ resource "google_dataproc_cluster" "spark_cluster" {
   cluster_config {
     master_config {
       num_instances = 1
-      machine_type  = "n1-standard-2"
+      machine_type  = "e2-standard-2"
       disk_config {
         boot_disk_size_gb = 50
       }
     }
 
     gce_cluster_config {
-      zone = "europe-west1-a"
+      zone = "europe-west1-c"
     }
 
     software_config {
